@@ -17,14 +17,14 @@ pipeline {
 		stage('Build') {
 			steps {
 				echo 'Building the project...'
-				sh 'mvn clean package -DskipTests'
+				bat 'mvn clean package -DskipTests'
 			}
 		}
 
 		stage('Test') {
 			steps {
 				echo 'Running tests...'
-				sh 'mvn test'
+				bat 'mvn test'
 			}
 			post {
 				always {
@@ -36,10 +36,10 @@ pipeline {
 
 	post {
 		success {
-			echo '✅ Pipeline completed successfully!'
+			echo 'Pipeline completed successfully!'
 		}
 		failure {
-			echo '❌ Pipeline failed. Please check the logs.'
+			echo 'Pipeline failed. Please check the logs.'
 		}
 	}
 }
