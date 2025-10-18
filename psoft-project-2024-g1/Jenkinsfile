@@ -17,18 +17,22 @@ pipeline {
 		stage('Build') {
 			steps {
 				echo 'Building the project...'
-				bat 'mvn clean package -DskipTests'
+				dir('psoft-project-2024-g1') {
+					bat 'mvn clean package -DskipTests'
+				}
 			}
 		}
 
 		stage('Test') {
 			steps {
 				echo 'Running tests...'
-				bat 'mvn test'
+				dir('psoft-project-2024-g1') {
+					bat 'mvn test'
+				}
 			}
 			post {
 				always {
-					junit 'target/surefire-reports/*.xml'
+					junit 'psoft-project-2024-g1/target/surefire-reports/*.xml'
 				}
 			}
 		}
