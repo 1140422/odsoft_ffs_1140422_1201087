@@ -18,10 +18,27 @@ pipeline {
 			steps {
 				echo 'Building the project...'
 				dir('psoft-project-2024-g1') {
-					bat 'mvn clean package -DskipTests'
+					bat 'mvn clean compile -DskipTests'
 				}
 			}
 		}
+
+		stage('Static Code Analysis') {
+            steps {
+                echo 'Running Checkstyle and SpotBugs...'
+                dir('psoft-project-2024-g1') {
+                    bat 'mvn checkstyle:check spotbugs:spotbugs -DskipTests'
+                }
+            }
+            post {
+                always {
+                    recordIssues tools: [
+                        checkStyle(pattern: 'psoft-project-2024-g1/target/checkstyle-result.xml'),
+                        spotBugs(pattern: 'psoft-project-2024-g1/target/spotbugsXml.xml')
+                    ]
+                }
+            }
+        }
 
 		stage('Test') {
 			steps {
