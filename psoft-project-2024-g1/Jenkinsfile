@@ -46,6 +46,7 @@ pipeline {
 			post {
 				always {
 					junit 'psoft-project-2024-g1/target/surefire-reports/*.xml'
+					jacoco execPattern: 'psoft-project-2024-g1/target/jacoco.exec'
 				}
 			}
 		}
