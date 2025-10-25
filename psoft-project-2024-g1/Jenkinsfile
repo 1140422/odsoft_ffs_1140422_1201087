@@ -72,14 +72,20 @@ pipeline {
             when {
                 expression { params.DEPLOY_MODE == 'dev' || params.DEPLOY_MODE == 'all' }
             }
-            steps {
-                echo "Starting Spring Boot app locally in DEV mode..."
-                // Stop any previously running app
-                bat 'taskkill /F /IM java.exe || echo No running app'
-                // Start in background
-                bat 'start cmd /c "mvn spring-boot:run -Dspring-boot.run.profiles=dev"'
-                echo "App started at http://localhost:8081"
-            }
+			steps {
+				echo "Stopping previous DEV app (port 8081)..."
+				bat '''
+					for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8081') do (
+						echo Killing process on port 8081 (PID %%a)
+						taskkill /PID %%a /F
+					)
+				'''
+				echo "Starting new Spring Boot DEV instance..."
+				bat '''
+					start /b cmd /c "mvn spring-boot:run -Dspring-boot.run.profiles=dev > dev_app.log 2>&1"
+				'''
+				echo "App starting at http://localhost:8081"
+			}
         }
 
 		stage('Build Docker Image') {
