@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  h2:
+    image: oscarfonts/h2
+    container_name: h2-db
+    ports:
+      - "1521:1521"
+      - "81:81"
+    environment:
+      - H2_OPTIONS=-ifNotExists
+    volumes:
+      - ./h2-data:/opt/h2-data
+
+  app:
+    build: .
+    container_name: psoft-g1-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - h2
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE:-staging}

@@ -48,3 +48,5 @@ Thumbs.db
 *.mov
 *.wmv
 
+data/psoft-g1.mv.db
+data/

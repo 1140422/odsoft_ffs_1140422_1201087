@@ -6,6 +6,20 @@ pipeline {
 		jdk 'Java17'
 	}
 
+    environment {
+        APP_NAME = "psoft-g1"
+        DOCKER_IMAGE = "psoft-g1-app"
+        DOCKER_TAG = "latest"
+    }
+
+    parameters {
+        choice(
+            name: 'DEPLOY_MODE',
+            choices: ['dev', 'staging', 'prod', 'all'],
+            description: 'Choose which environment(s) to deploy to'
+        )
+    }
+
 	stages {
 		stage('Checkout') {
 			steps {
