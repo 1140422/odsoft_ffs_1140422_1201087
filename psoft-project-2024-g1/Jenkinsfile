@@ -70,7 +70,7 @@ pipeline {
 
         stage('Deploy DEV') {
             when {
-                expression { params.ENVIRONMENT == 'dev' || params.DEPLOY_MODE == 'all' }
+                expression { params.DEPLOY_MODE == 'dev' || params.DEPLOY_MODE == 'all' }
             }
             steps {
                 echo "Starting Spring Boot app locally in DEV mode..."
@@ -78,13 +78,13 @@ pipeline {
                 bat 'taskkill /F /IM java.exe || echo No running app'
                 // Start in background
                 bat 'start cmd /c "mvn spring-boot:run -Dspring-boot.run.profiles=dev"'
-                echo "App started at http://localhost:8080"
+                echo "App started at http://localhost:8081"
             }
         }
 
 		stage('Build Docker Image') {
             when {
-                expression { params.ENVIRONMENT == 'staging' }
+                expression { params.DEPLOY_MODE == 'staging' || params.DEPLOY_MODE == 'all' }
             }
             steps {
                 bat "docker build -t %DOCKER_IMAGE%:%DOCKER_TAG% ."
