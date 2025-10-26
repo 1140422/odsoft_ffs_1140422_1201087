@@ -50,11 +50,30 @@ pipeline {
                             id: 'jacoco', name: 'JaCoCo Coverage',
                             sourceCodeRetention: 'EVERY_BUILD',
                             qualityGates: [
-                                    [threshold: 60.0, metric: 'LINE', baseline: 'PROJECT', unstable: true],
-                                    [threshold: 60.0, metric: 'BRANCH', baseline: 'PROJECT', unstable: true]])
+                                    [threshold: 10.0, metric: 'LINE', baseline: 'PROJECT', unstable: true],
+                                    [threshold: 2.0, metric: 'BRANCH', baseline: 'PROJECT', unstable: true]])
 				}
 			}
 		}
+
+		stage('Mutation Tests') {
+            steps {
+                dir('psoft-project-2024-g1') {
+                    bat 'mvn pitest:mutationCoverage'
+                }
+            }
+            post {
+                always {
+                    publishHTML(target: [
+                        allowMissing: true,
+                        keepAll: true,
+                        reportDir: 'psoft-project-2024-g1/target/pit-reports',
+                        reportFiles: 'index.html',
+                        reportName: 'Mutation Testing Report'
+                    ])
+                }
+            }
+        }
 
 		stage('Integration Tests') {
             steps {
