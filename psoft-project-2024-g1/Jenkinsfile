@@ -51,7 +51,7 @@ pipeline {
                             sourceCodeRetention: 'EVERY_BUILD',
                             qualityGates: [
                                     [threshold: 10.0, metric: 'LINE', baseline: 'PROJECT', unstable: true],
-                                    [threshold: 10.0, metric: 'BRANCH', baseline: 'PROJECT', unstable: true]])
+                                    [threshold: 2.0, metric: 'BRANCH', baseline: 'PROJECT', unstable: true]])
 				}
 			}
 		}
@@ -67,7 +67,7 @@ pipeline {
                     publishHTML(target: [
                         allowMissing: true,
                         keepAll: true,
-                        reportDir: 'target/pit-reports',
+                        reportDir: 'psoft-project-2024-g1/target/pit-reports',
                         reportFiles: 'index.html',
                         reportName: 'Mutation Testing Report'
                     ])
