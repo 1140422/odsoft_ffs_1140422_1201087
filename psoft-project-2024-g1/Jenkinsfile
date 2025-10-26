@@ -9,14 +9,12 @@ pipeline {
 	stages {
 		stage('Checkout') {
 			steps {
-				echo 'Checking out source code...'
 				checkout scm
 			}
 		}
 
 		stage('Build') {
 			steps {
-				echo 'Building the project...'
 				dir('psoft-project-2024-g1') {
 					bat 'mvn clean compile -DskipTests'
 				}
@@ -25,7 +23,6 @@ pipeline {
 
 		stage('Static Code Analysis') {
             steps {
-                echo 'Running Checkstyle and SpotBugs...'
                 dir('psoft-project-2024-g1') {
                     bat 'mvn checkstyle:check spotbugs:spotbugs -DskipTests'
                 }
@@ -40,9 +37,8 @@ pipeline {
             }
         }
 
-		stage('Test') {
+		stage('Unit Tests') {
 			steps {
-				echo 'Running tests...'
 				dir('psoft-project-2024-g1') {
 					bat 'mvn test'
 				}
@@ -50,9 +46,28 @@ pipeline {
 			post {
 				always {
 					junit 'psoft-project-2024-g1/target/surefire-reports/*.xml'
+					recordCoverage(tools: [[parser: 'JACOCO']],
+                            id: 'jacoco', name: 'JaCoCo Coverage',
+                            sourceCodeRetention: 'EVERY_BUILD',
+                            qualityGates: [
+                                    [threshold: 60.0, metric: 'LINE', baseline: 'PROJECT', unstable: true],
+                                    [threshold: 60.0, metric: 'BRANCH', baseline: 'PROJECT', unstable: true]])
 				}
 			}
 		}
+
+		stage('Integration Tests') {
+            steps {
+                dir('psoft-project-2024-g1') {
+                    bat 'mvn verify'
+                }
+            }
+            post {
+                always {
+                    junit 'psoft-project-2024-g1/target/failsafe-reports/*.xml'
+                }
+            }
+        }
 	}
 
 	post {
