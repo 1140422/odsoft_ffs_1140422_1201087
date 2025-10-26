@@ -96,22 +96,27 @@ pipeline {
 				'''
 				echo "Starting new Spring Boot DEV instance..."
 				powershell '''
-					Start-Process "java" -ArgumentList "-jar psoft-project-2024-g1\\target\\psoft-g1-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev" -WindowStyle Hidden
+					Start-Process "java" -ArgumentList "-jar psoft-project-2024-g1\\target\\psoft-g1-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev" -RedirectStandardOutput "dev_app.log" -RedirectStandardError "dev_app_error.log" -WindowStyle Hidden
 				'''
 				echo "Spring Boot started (check dev_app.log)"
 				echo "App starting at http://localhost:8081"
 			}
         }
 
-		stage('Build Docker Image') {
-            when {
-                expression { params.DEPLOY_MODE == 'staging' || params.DEPLOY_MODE == 'all' }
-            }
-            steps {
-                bat "docker build -t %DOCKER_IMAGE%:%DOCKER_TAG% ."
-            }
-        }
-	}
+		stage('Deploy STAGING') {
+			when {
+				expression { params.DEPLOY_MODE == 'staging' || params.DEPLOY_MODE == 'all' }
+			}
+			steps {
+				echo "Deploying to STAGING Docker container..."
+				bat '''
+					cd psoft-project-2024-g1
+					docker-compose down psoft-staging || echo "No existing container."
+					docker-compose build psoft-staging
+					docker-compose up -d psoft-staging
+				'''
+			}
+		}
 
 	post {
 		success {

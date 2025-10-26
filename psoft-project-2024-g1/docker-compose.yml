@@ -1,23 +1,24 @@
-version: '3.8'
-
 services:
-  h2:
-    image: oscarfonts/h2
-    container_name: h2-${SPRING_PROFILE}
+  psoft-staging:
+    image: psoft-g1:staging
+    container_name: psoft-staging
+    build:
+      context: .
     ports:
-      - "${DB_PORT:-1521}:1521"
-      - "${H2_WEB_PORT:-81}:81"
+      - "8082:8080"
     environment:
-      - H2_OPTIONS=-ifNotExists
+      - SPRING_PROFILES_ACTIVE=staging
     volumes:
-      - ./h2-data-${SPRING_PROFILE}:/opt/h2-data
+      - ./data-staging:/app/data
 
-  app:
-    build: .
-    container_name: psoft-g1-${SPRING_PROFILE}
+  psoft-prod:
+    image: psoft-g1:prod
+    container_name: psoft-prod
+    build:
+      context: .
     ports:
-      - "${APP_PORT:-8080}:8080"
-    depends_on:
-      - h2
+      - "8083:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE}
+      - SPRING_PROFILES_ACTIVE=prod
+    volumes:
+      - ./data-prod:/app/data
