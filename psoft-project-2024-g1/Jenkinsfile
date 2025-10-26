@@ -96,7 +96,7 @@ pipeline {
 				'''
 				echo "Starting new Spring Boot DEV instance..."
 				powershell '''
-					Start-Process "java" -ArgumentList "-jar target\\psoft-g1-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev" -RedirectStandardOutput "dev_app.log" -RedirectStandardError "dev_app_error.log" -WindowStyle Hidden
+					Start-Process "java" -ArgumentList "-jar target\\psoft-g1-0.0.1-SNAPSHOT.jar -WindowStyle Hidden
 				'''
 				echo "Spring Boot started (check dev_app.log)"
 				echo "App starting at http://localhost:8081"
