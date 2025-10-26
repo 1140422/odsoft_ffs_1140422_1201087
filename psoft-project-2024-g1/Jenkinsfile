@@ -85,8 +85,8 @@ pipeline {
 				echo "Starting new Spring Boot DEV instance..."
 				powershell '''
 				Start-Process "mvn" -ArgumentList "spring-boot:run","-Dspring-boot.run.profiles=dev" -RedirectStandardOutput "dev_app.log" -RedirectStandardError "dev_app.log" -WindowStyle Hidden
-				Write-Host "Spring Boot started (check dev_app.log)"
 				'''
+				echo "Spring Boot started (check dev_app.log)"
 				echo "App starting at http://localhost:8081"
 			}
         }
