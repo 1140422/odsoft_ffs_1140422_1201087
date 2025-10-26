@@ -73,18 +73,30 @@ pipeline {
                 expression { params.DEPLOY_MODE == 'dev' || params.DEPLOY_MODE == 'all' }
             }
 			steps {
-				echo "Stopping previous DEV app (port 8081)..."
-				bat '''
-					echo Checking for any process using port 8081...
-					for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8081 2^>nul') do (
-						echo Killing process on port 8081 (PID %%a)
-						taskkill /PID %%a /F >nul 2>&1 || echo Could not kill PID %%a (may have exited already)
-					)
-					exit /b 0
+				powershell '''
+				Write-Host "Checking for any process using port 8081..."
+
+				# Get the PID of any process listening on port 8081
+				$pids = (Get-NetTCPConnection -LocalPort 8081 -ErrorAction SilentlyContinue).OwningProcess | Sort-Object -Unique
+
+				if ($pids) {
+					foreach ($pid in $pids) {
+						try {
+							Write-Host "Killing process on port 8081 (PID $pid)..."
+							Stop-Process -Id $pid -Force -ErrorAction Stop
+						} catch {
+							Write-Host "Could not kill PID $pid (may have exited already)."
+						}
+					}
+				} else {
+					Write-Host "No process found using port 8081."
+				}
+
+				Write-Host "Done checking port 8081."
 				'''
 				echo "Starting new Spring Boot DEV instance..."
 				powershell '''
-				Start-Process "mvn" -ArgumentList "spring-boot:run","-Dspring-boot.run.profiles=dev" -RedirectStandardOutput "dev_app.log" -RedirectStandardError "dev_app_error.log" -WindowStyle Hidden
+					Start-Process "mvn" -ArgumentList "spring-boot:run","-Dspring-boot.run.profiles=dev" -RedirectStandardOutput "dev_app.log" -RedirectStandardError "dev_app_error.log" -WindowStyle Hidden
 				'''
 				echo "Spring Boot started (check dev_app.log)"
 				echo "App starting at http://localhost:8081"
