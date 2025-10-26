@@ -96,7 +96,7 @@ pipeline {
 				'''
 				echo "Starting new Spring Boot DEV instance..."
 				powershell '''
-					Start-Process "java" -ArgumentList "-jar psoft-project-2024-g1\\target\\psoft-g1-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev" -RedirectStandardOutput "dev_app.log" -RedirectStandardError "dev_app_error.log" -WindowStyle Hidden
+					Start-Process "java" -ArgumentList "-jar psoft-project-2024-g1\\target\\psoft-g1-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev" -WindowStyle Hidden
 				'''
 				echo "Spring Boot started (check dev_app.log)"
 				echo "App starting at http://localhost:8081"
@@ -117,6 +117,24 @@ pipeline {
 				'''
 			}
 		}
+
+		stage('Deploy PRODUCTION') {
+			when {
+				expression { params.DEPLOY_MODE == 'prod' || params.DEPLOY_MODE == 'all' }
+			}
+			steps {
+				echo "Deploying PRODUCTION with H2 database in separate container..."
+				bat '''
+					cd psoft-project-2024-g1
+					docker-compose down psoft-prod || echo "No existing production containers."
+					docker-compose build
+					docker-compose up -d psoft-prod
+				'''
+				echo "Production app and H2 database started."
+				echo "App: http://localhost:8083, H2 console: http://localhost:8084"
+			}
+		}
+	
 	}
 
 	post {
