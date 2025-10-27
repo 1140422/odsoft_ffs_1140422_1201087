@@ -23,14 +23,12 @@ pipeline {
 	stages {
 		stage('Checkout') {
 			steps {
-				echo 'Checking out source code...'
 				checkout scm
 			}
 		}
 
 		stage('Build') {
 			steps {
-				echo 'Building the project...'
 				dir('psoft-project-2024-g1') {
 					bat 'mvn clean package -DskipTests'
 				}
@@ -39,7 +37,6 @@ pipeline {
 
 		stage('Static Code Analysis') {
             steps {
-                echo 'Running Checkstyle and SpotBugs...'
                 dir('psoft-project-2024-g1') {
                     bat 'mvn checkstyle:check spotbugs:spotbugs -DskipTests'
                 }
@@ -54,9 +51,8 @@ pipeline {
             }
         }
 
-		stage('Test') {
+		stage('Unit Tests') {
 			steps {
-				echo 'Running tests...'
 				dir('psoft-project-2024-g1') {
 					bat 'mvn test'
 				}
@@ -64,9 +60,47 @@ pipeline {
 			post {
 				always {
 					junit 'psoft-project-2024-g1/target/surefire-reports/*.xml'
+					recordCoverage(tools: [[parser: 'JACOCO']],
+                            id: 'jacoco', name: 'JaCoCo Coverage',
+                            sourceCodeRetention: 'EVERY_BUILD',
+                            qualityGates: [
+                                    [threshold: 10.0, metric: 'LINE', baseline: 'PROJECT', unstable: true],
+                                    [threshold: 2.0, metric: 'BRANCH', baseline: 'PROJECT', unstable: true]])
 				}
 			}
 		}
+
+		stage('Mutation Tests') {
+            steps {
+                dir('psoft-project-2024-g1') {
+                    bat 'mvn pitest:mutationCoverage'
+                }
+            }
+            post {
+                always {
+                    publishHTML(target: [
+                        allowMissing: true,
+                        keepAll: true,
+                        reportDir: 'psoft-project-2024-g1/target/pit-reports',
+                        reportFiles: 'index.html',
+                        reportName: 'Mutation Testing Report'
+                    ])
+                }
+            }
+        }
+
+		stage('Integration Tests') {
+            steps {
+                dir('psoft-project-2024-g1') {
+                    bat 'mvn verify'
+                }
+            }
+            post {
+                always {
+                    junit 'psoft-project-2024-g1/target/failsafe-reports/*.xml'
+                }
+            }
+        }
 
         stage('Deploy DEV') {
             when {
@@ -134,7 +168,7 @@ pipeline {
 				echo "App: http://localhost:8083, H2 console: http://localhost:8084"
 			}
 		}
-	
+
 	}
 
 	post {
