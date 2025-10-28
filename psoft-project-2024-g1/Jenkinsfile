@@ -6,6 +6,20 @@ pipeline {
 		jdk 'Java17'
 	}
 
+    environment {
+        APP_NAME = "psoft-g1"
+        DOCKER_IMAGE = "psoft-g1-app"
+        DOCKER_TAG = "latest"
+    }
+
+    parameters {
+        choice(
+            name: 'DEPLOY_MODE',
+            choices: ['dev', 'staging', 'prod', 'all'],
+            description: 'Choose which environment(s) to deploy to'
+        )
+    }
+
 	stages {
 		stage('Checkout') {
 			steps {
@@ -16,7 +30,7 @@ pipeline {
 		stage('Build') {
 			steps {
 				dir('psoft-project-2024-g1') {
-					bat 'mvn clean compile -DskipTests'
+					bat 'mvn clean package -DskipTests'
 				}
 			}
 		}
@@ -87,6 +101,74 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy DEV') {
+            when {
+                expression { params.DEPLOY_MODE == 'dev' || params.DEPLOY_MODE == 'all' }
+            }
+			steps {
+				powershell '''
+				Write-Host "Checking for any process using port 8081..."
+
+				# Get the PID of any process listening on port 8081
+				$pids = (Get-NetTCPConnection -LocalPort 8081 -ErrorAction SilentlyContinue).OwningProcess | Sort-Object -Unique
+
+				if ($pids) {
+					foreach ($pid in $pids) {
+						try {
+							Write-Host "Killing process on port 8081 (PID $pid)..."
+							Stop-Process -Id $pid -Force -ErrorAction Stop
+						} catch {
+							Write-Host "Could not kill PID $pid (may have exited already)."
+						}
+					}
+				} else {
+					Write-Host "No process found using port 8081."
+				}
+
+				Write-Host "Done checking port 8081."
+				'''
+				echo "Starting new Spring Boot DEV instance..."
+				powershell '''
+					Start-Process "java" -ArgumentList "-jar psoft-project-2024-g1\\target\\psoft-g1-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev" -WindowStyle Hidden
+				'''
+				echo "Spring Boot started (check dev_app.log)"
+				echo "App starting at http://localhost:8081"
+			}
+        }
+
+		stage('Deploy STAGING') {
+			when {
+				expression { params.DEPLOY_MODE == 'staging' || params.DEPLOY_MODE == 'all' }
+			}
+			steps {
+				echo "Deploying to STAGING Docker container..."
+				bat '''
+					cd psoft-project-2024-g1
+					docker-compose down psoft-staging || echo "No existing container."
+					docker-compose build psoft-staging
+					docker-compose up -d psoft-staging
+				'''
+			}
+		}
+
+		stage('Deploy PRODUCTION') {
+			when {
+				expression { params.DEPLOY_MODE == 'prod' || params.DEPLOY_MODE == 'all' }
+			}
+			steps {
+				echo "Deploying PRODUCTION with H2 database in separate container..."
+				bat '''
+					cd psoft-project-2024-g1
+					docker-compose down psoft-prod || echo "No existing production containers."
+					docker-compose build
+					docker-compose up -d psoft-prod
+				'''
+				echo "Production app and H2 database started."
+				echo "App: http://localhost:8083, H2 console: http://localhost:8084"
+			}
+		}
+
 	}
 
 	post {

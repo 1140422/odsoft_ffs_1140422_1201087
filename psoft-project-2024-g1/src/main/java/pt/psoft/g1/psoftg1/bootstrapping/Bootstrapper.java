@@ -55,7 +55,7 @@ public class Bootstrapper implements CommandLineRunner {
         createGenres();
         createBooks();
         loadForbiddenNames();
-        createLendings();
+        //createLendings();
         createPhotos();
     }
 
@@ -388,7 +388,7 @@ public class Bootstrapper implements CommandLineRunner {
         forbiddenNameService.loadDataFromFile(fileName);
     }
 
-    private void createLendings() {
+   /* private void createLendings() {
         int i;
         int seq = 0;
         final var book1 = bookRepository.findByIsbn("9789720706386");
@@ -413,6 +413,10 @@ public class Bootstrapper implements CommandLineRunner {
                     book8.get(), book9.get(), book10.get()});
         }
 
+        for (Book book : books) {
+            System.out.println(book.getTitle());
+        }
+
         final var readerDetails1 = readerRepository.findByReaderNumber("2024/1");
         final var readerDetails2 = readerRepository.findByReaderNumber("2024/2");
         final var readerDetails3 = readerRepository.findByReaderNumber("2024/3");
@@ -421,9 +425,14 @@ public class Bootstrapper implements CommandLineRunner {
         final var readerDetails6 = readerRepository.findByReaderNumber("2024/6");
 
         List<ReaderDetails> readers = new ArrayList<>();
-        if(readerDetails1.isPresent() && readerDetails2.isPresent() && readerDetails3.isPresent()){
+        if(readerDetails1.isPresent() && readerDetails2.isPresent() && readerDetails3.isPresent() 
+            && readerDetails4.isPresent() && readerDetails5.isPresent() && readerDetails6.isPresent()){
             readers = List.of(new ReaderDetails[]{readerDetails1.get(), readerDetails2.get(), readerDetails3.get(),
                             readerDetails4.get(), readerDetails5.get(), readerDetails6.get()});
+        }
+
+        for (ReaderDetails readerD : readers) {
+            System.out.println(readerD.getReader());
         }
 
         LocalDate startDate;
@@ -436,6 +445,7 @@ public class Bootstrapper implements CommandLineRunner {
             if(lendingRepository.findByLendingNumber("2024/" + seq).isEmpty()){
                 startDate = LocalDate.of(2024, 1,31-i);
                 returnedDate = LocalDate.of(2024,2,15+i);
+                //System.ou.println(books.get(i).toString());
                 lending = Lending.newBootstrappingLending(books.get(i), readers.get(i*2), 2024, seq, startDate, returnedDate, lendingDurationInDays, fineValuePerDayInCents);
                 lendingRepository.save(lending);
             }
@@ -523,7 +533,7 @@ public class Bootstrapper implements CommandLineRunner {
                 lendingRepository.save(lending);
             }
         }
-    }
+    }*/
 
     private void createPhotos() {
         /*Optional<Photo> photoJoao = photoRepository.findByPhotoFile("foto-joao.jpg");

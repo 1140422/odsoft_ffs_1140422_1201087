@@ -1,0 +1,40 @@
+services:
+  psoft-staging:
+    image: psoft-g1:staging
+    container_name: psoft-staging
+    build:
+      context: .
+    ports:
+      - "8082:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=staging
+    volumes:
+      - ./data-staging:/app/data
+
+  h2-prod:
+    image: oscarfonts/h2
+    container_name: h2-prod
+    ports:
+      - "1521:1521" # H2 TCP port
+      - "8084:81" # H2 web console
+    environment:
+      H2_OPTIONS: "-tcp -tcpAllowOthers -ifNotExists -tcpPort 1521 -web -webAllowOthers -webPort 81"
+      H2_USER: mysqluser
+      H2_PASSWORD: mysqlpass
+    volumes:
+      - h2-prod-data:/opt/h2-data
+
+  psoft-prod:
+    image: psoft-g1:prod
+    container_name: psoft-prod
+    build:
+      context: .
+    depends_on:
+      - h2-prod
+    ports:
+      - "8083:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+
+volumes:
+  h2-prod-data:

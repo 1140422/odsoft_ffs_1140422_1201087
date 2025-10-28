@@ -1,0 +1,14 @@
+# Use a slim OpenJDK base image
+FROM openjdk:17-jdk-slim
+
+# Set working directory
+WORKDIR /app
+
+# Copy the JAR (assuming it's built by Maven)
+COPY target/psoft-g1-0.0.1-SNAPSHOT.jar app.jar
+
+# Expose ports for different environments (8081 for dev, 8082 for staging, etc.)
+EXPOSE 8080
+
+# Default command (you can override with Docker run)
+ENTRYPOINT ["java", "-jar", "app.jar"]
