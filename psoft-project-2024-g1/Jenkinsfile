@@ -141,11 +141,15 @@ pipeline {
                 script {
                     if (isUnix()) {
                         sh '''
-                        PID=$(lsof -ti:8081)
-                        if [ "$PID" ]; then
+                        echo "Checking for any process using port 8081..."
+                        PID=$(fuser 8081/tcp 2>/dev/null)
+                        if [ -n "$PID" ]; then
+                            echo "Killing process(es) on port 8081: $PID"
                             kill -9 $PID
+                        else
+                            echo "No process found using port 8081."
                         fi
-                        java -jar psoft-project-2024-g1/target/psoft-g1-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev > dev_app.log 2>&1 &
+                        nohup java -jar psoft-project-2024-g1/target/psoft-g1-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev > dev_app.log 2>&1 &
                         echo "Spring Boot started (check dev_app.log)"
                         echo "App starting at http://localhost:8081"
                         '''

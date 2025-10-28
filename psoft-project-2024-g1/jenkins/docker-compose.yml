@@ -2,10 +2,10 @@ version: "3.9"
 
 services:
   jenkins:
-    image: jenkins/jenkins:lts-jdk17
+    build: .                 # Usa o Dockerfile atual
     container_name: jenkins
     ports:
-      - "8090:8080"
+      - "8090:8080"          # altera se a 8080 estiver ocupada
       - "50000:50000"
     volumes:
       - jenkins_home:/var/jenkins_home
