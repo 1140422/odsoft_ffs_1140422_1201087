@@ -1,6 +1,6 @@
 # Application Deployment Architecture & CI/CD Pipeline 
 
-## 📘 Overview 
+## Overview 
 This document describes the deployment architecture and CI/CD pipeline for the Java application `psoft-g1`, managed via Jenkins with multi-environment deployments: **Development**, **Staging**, and **Production**. 
 
 The pipeline automates build, testing (unit, integration, mutation), static analysis, and deployment steps using **Maven**, **Docker**, and **Docker Compose**, ensuring code quality and continuous delivery.
@@ -108,6 +108,14 @@ The pipeline automates build, testing (unit, integration, mutation), static anal
  - H2 Console: `8084` 
 
  **Access:** ``` http://localhost:8083 ``` 
+
+---
+
+ #### **Pipeline Flow**
+
+ <p align="center">
+  <img src="Diagrams/PipelineFlow.png" alt="Pipeline Flow">
+</p>
  
  --- 
  
@@ -118,10 +126,24 @@ The pipeline automates build, testing (unit, integration, mutation), static anal
  | Staging | Docker (single container)| Java App + H2 | 8082 | Embedded H2 | `docker-compose up psoft-staging` |
  | Production | Docker (multi-container)| Java App + DB | 8083, 8084 | Dedicated DB | `docker-compose up psoft-prod` | 
 
-## Deployment Diagram
+---
+
+### Deployment Diagram (System-To-Be)
 
 <p align="center">
   <img src="Diagrams/DeploymentDiagram_SystemToBe.png" alt="Deployment Diagram">
+</p>
+
+---
+
+### Build Time Evidences
+
+<p align="center">
+  <img src="Diagrams/BuildTimeTrendGraph.png" alt="Build Time Graph">
+</p>
+
+<p align="center">
+  <img src="Diagrams/StagesTimeEvidences.png" alt="Time per stages">
 </p>
 
 ---
