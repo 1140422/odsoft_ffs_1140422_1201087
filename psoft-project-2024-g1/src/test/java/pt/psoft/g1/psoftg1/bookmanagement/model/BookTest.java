@@ -116,4 +116,14 @@ class BookTest {
         assertEquals(newGenre, book.getGenre());
         assertEquals(newAuthors, book.getAuthors());
     }
+
+    @Test
+    void testGetIsbnAndDescriptionReturnCorrectValues() {
+        authors.add(validAuthor1);
+        Book book = new Book(validIsbn, validTitle, "Uma história encantadora", validGenre, authors, null);
+
+        assertEquals(validIsbn, book.getIsbn());
+        assertEquals("Uma história encantadora", book.getDescription());
+    }
+
 }
