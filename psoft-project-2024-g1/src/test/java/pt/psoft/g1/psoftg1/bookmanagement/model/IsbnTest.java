@@ -62,4 +62,34 @@ class IsbnTest {
     void ensureChecksum10IsCorrect() {
         assertThrows(IllegalArgumentException.class, () -> new Isbn("8175257667"));
     }
+
+    @Test
+    void ensureEqualsReturnsTrueForSameIsbn() {
+        Isbn isbn1 = new Isbn("9782826012092");
+        Isbn isbn2 = new Isbn("9782826012092");
+
+        assertEquals(isbn1, isbn2);
+        assertEquals(isbn1.hashCode(), isbn2.hashCode());
+    }
+
+    @Test
+    void ensureEqualsReturnsFalseForDifferentIsbn() {
+        Isbn isbn1 = new Isbn("9782826012092");
+        Isbn isbn2 = new Isbn("8175257660");
+
+        assertNotEquals(isbn1, isbn2);
+        assertNotEquals(isbn1.hashCode(), isbn2.hashCode());
+    }
+
+    @Test
+    void ensureEqualsReturnsFalseWhenComparingWithNull() {
+        Isbn isbn = new Isbn("9782826012092");
+        assertNotEquals(isbn, null);
+    }
+
+    @Test
+    void ensureEqualsReturnsFalseWhenComparingWithDifferentType() {
+        Isbn isbn = new Isbn("9782826012092");
+        assertNotEquals(isbn, "9782826012092");
+    }
 }
