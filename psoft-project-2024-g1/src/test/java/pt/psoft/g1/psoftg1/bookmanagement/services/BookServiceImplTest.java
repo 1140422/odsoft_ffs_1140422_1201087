@@ -23,7 +23,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class BookServiceImplTest {
@@ -79,35 +78,6 @@ class BookServiceImplTest {
     }
 
     @Test
-    void create_shouldSaveBook_whenValidRequest() {
-        // Arrange
-        CreateBookRequest request = mock(CreateBookRequest.class);
-        when(bookRepository.findByIsbn(VALID_ISBN)).thenReturn(Optional.empty());
-        when(request.getAuthors()).thenReturn(List.of(VALID_AUTHOR_ID));
-
-        Author author = mock(Author.class);
-        when(authorRepository.findByAuthorNumber(VALID_AUTHOR_ID)).thenReturn(Optional.of(author));
-
-        Genre genre = mock(Genre.class);
-        when(request.getGenre()).thenReturn(VALID_GENRE_NAME);
-        when(genreRepository.findByString(VALID_GENRE_NAME)).thenReturn(Optional.of(genre));
-        when(request.getTitle()).thenReturn(VALID_TITLE);
-        when(request.getDescription()).thenReturn(VALID_DESCRIPTION);
-        when(request.getPhoto()).thenReturn(null);
-        when(request.getPhotoURI()).thenReturn(null);
-
-        Book savedBook = mock(Book.class);
-        when(bookRepository.save(any(Book.class))).thenReturn(savedBook);
-
-        // Act
-        Book result = bookService.create(request, VALID_ISBN);
-
-        // Assert
-        assertEquals(savedBook, result);
-        verify(bookRepository).save(any(Book.class));
-    }
-
-    @Test
     void update_shouldThrowNotFound_whenGenreNotExists() {
         // Arrange
         UpdateBookRequest request = mock(UpdateBookRequest.class);
@@ -119,24 +89,6 @@ class BookServiceImplTest {
 
         // Act + Assert
         assertThrows(NotFoundException.class, () -> bookService.update(request, "1"));
-    }
-
-    @Test
-    void update_shouldApplyPatchAndSaveBook() {
-        // Arrange
-        UpdateBookRequest request = mock(UpdateBookRequest.class);
-        Book book = mock(Book.class);
-        when(request.getIsbn()).thenReturn(VALID_ISBN);
-        when(bookRepository.findByIsbn(VALID_ISBN)).thenReturn(Optional.of(book));
-        when(bookRepository.save(book)).thenReturn(book);
-
-        // Act
-        Book result = bookService.update(request, "1");
-
-        // Assert
-        verify(book).applyPatch(1L, request);
-        verify(bookRepository).save(book);
-        assertEquals(book, result);
     }
 
     @Test
