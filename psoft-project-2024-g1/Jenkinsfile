@@ -149,8 +149,7 @@ pipeline {
                         else
                             echo "No process found using port 8081."
                         fi
-                        nohup java -jar psoft-project-2024-g1/target/psoft-g1-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev > dev_app.log 2>&1 &
-                        disown
+                        setsid java -jar psoft-project-2024-g1/target/psoft-g1-0.0.1-SNAPSHOT.jar --spring.profiles.active=dev > dev_app.log 2>&1 &
                         echo "Spring Boot started (check dev_app.log)"
                         echo "App starting at http://localhost:8081"
                         '''
