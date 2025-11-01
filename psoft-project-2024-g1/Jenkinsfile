@@ -142,7 +142,7 @@ pipeline {
                     if (isUnix()) {
                         sh '''
                         echo "Checking for any process using port 8081..."
-                        PID=$(fuser 8081/tcp 2>/dev/null)
+                        PID=$(lsof -ti:8081)
                         if [ -n "$PID" ]; then
                             echo "Killing process(es) on port 8081: $PID"
                             kill -9 $PID

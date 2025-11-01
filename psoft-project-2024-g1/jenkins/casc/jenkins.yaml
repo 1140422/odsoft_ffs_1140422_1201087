@@ -1,0 +1,9 @@
+tool:
+  maven:
+    installations:
+      - name: "Maven3"
+        home: "/usr/share/maven"
+  jdk:
+    installations:
+      - name: "Java17"
+        home: "/opt/java/openjdk"
