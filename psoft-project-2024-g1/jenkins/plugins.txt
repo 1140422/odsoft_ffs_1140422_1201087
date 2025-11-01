@@ -1,0 +1,15 @@
+git
+htmlpublisher
+warnings-ng
+coverage
+pipeline-model-definition
+workflow-aggregator
+docker-plugin
+docker-workflow
+credentials-binding
+pipeline-utility-steps
+blueocean
+jacoco
+checkstyle
+spotbugs
+pitmutation

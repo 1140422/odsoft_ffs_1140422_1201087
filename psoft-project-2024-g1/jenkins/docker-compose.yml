@@ -1,14 +1,18 @@
-version: "3.9"
-
 services:
   jenkins:
-    build: .                 # Usa o Dockerfile atual
+    build: .
     container_name: jenkins
+    restart: unless-stopped
+    user: root
     ports:
-      - "8090:8080"          # altera se a 8080 estiver ocupada
+      - "8080:8080"
+      - "8081:8081"
       - "50000:50000"
     volumes:
       - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
 
 volumes:
   jenkins_home:

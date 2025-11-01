@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class AuthorTest {
     private final String validName = "João Alberto";
     private final String validBio = "O João Alberto nasceu em Chaves e foi pedreiro a maior parte da sua vida.";
+    private final String validPhotoURI = "authorPhoto.jpg";
 
     private final UpdateAuthorRequest request = new UpdateAuthorRequest(validName, validBio, null, null);
 
@@ -27,8 +28,17 @@ class AuthorTest {
     }
 
     @Test
+    void ensureNameCannotBeBlank() { assertThrows(IllegalArgumentException.class, () -> new Author("", validBio, validPhotoURI)); }
+
+    @Test
     void ensureBioNotNull(){
         assertThrows(IllegalArgumentException.class, () -> new Author(validName,null, null));
+    }
+
+    @Test
+    void ensureBioCannotBeBlank(){
+        assertThrows(IllegalArgumentException.class, () -> new Author(validName,"", null));
+        assertThrows(IllegalArgumentException.class, () -> new Author(validName,"    ", null));
     }
 
     @Test
@@ -81,6 +91,39 @@ class AuthorTest {
         Photo photo = author.getPhoto();
         assertNotNull(photo);
         assertEquals("photoTest.jpg", photo.getPhotoFile());
+    }
+
+    @Test
+    void shouldCoverVersionMismatchCondition() {
+        // Covers: if (version != currentVersion)
+        Author author = new Author("Name", "Bio", null);
+        UpdateAuthorRequest request = new UpdateAuthorRequest("New", null, null, null);
+
+        assertThrows(StaleObjectStateException.class,
+                () -> author.applyPatch(999L, request));
+    }
+
+    @Test
+    void shouldTransitionFromInitialToUpdatedState() {
+        Author author = new Author("Initial Name", "Initial Bio", "Initial Photo");
+        long version = author.getVersion();
+
+        UpdateAuthorRequest request = new UpdateAuthorRequest(
+                "Updated Bio", "Updated Name", null, "Updated Photo");
+
+        author.applyPatch(version, request);
+
+        assertEquals("Updated Name", author.getName());
+        assertEquals("Updated Bio", author.getBio());
+    }
+
+    @Test
+    void shouldRejectTransitionWithInvalidVersion() {
+        Author author = new Author("Name", "Bio", null);
+        UpdateAuthorRequest request = new UpdateAuthorRequest("New", "New", null, null);
+
+        assertThrows(StaleObjectStateException.class,
+                () -> author.applyPatch(999L, request));
     }
 }
 
