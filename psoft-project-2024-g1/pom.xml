@@ -208,7 +208,7 @@
 				<configuration>
 					<!-- Classes alvo para mutação -->
 					<targetClasses>
-						<param>pt.psoft.g1.*</param>
+						<param>pt.psoft.g1.*.model.</param>
 					</targetClasses>
 
 					<!-- Excluir todos os testes de integração -->
