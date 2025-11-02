@@ -194,6 +194,12 @@
 						</goals>
 					</execution>
 				</executions>
+                <configuration>
+                    <excludes>
+                        <exclude>**/bootstrapping/**</exclude>
+                        <exclude>**/JpaConfig.class</exclude>
+                    </excludes>
+                </configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.pitest</groupId>
