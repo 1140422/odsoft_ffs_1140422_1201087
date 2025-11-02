@@ -210,7 +210,6 @@
                     <targetClasses>
                         <param>pt.psoft.g1.psoftg1.*.model.*</param>
                     </targetClasses>
-
                     <!-- Testes que o PIT vai executar -->
                     <targetTests>
                         <param>pt.psoft.g1.psoftg1.**.model.*Test</param>
