@@ -4,7 +4,7 @@
 
 The system is structured into the following **layers/packages**:
 
-![System-As-Is Implementation View.png](System-As-Is%20Implementation%20View.png)
+![System-As-Is Implementation View.png](Diagrams/System-As-Is%20Implementation%20View.png)
 
 ### Infrastructure
 - **Routes**: Defines HTTP endpoints or API routes that map external requests to controllers.
@@ -33,7 +33,7 @@ The system is structured into the following **layers/packages**:
 
 ## Deployment View (C4 Level 4)
 
-![System-As-Is Deployment View.png](System-As-Is%20Deployment%20View.png)
+![System-As-Is Deployment View.png](Diagrams/System-As-Is%20Deployment%20View.png)
  
 ---
 
