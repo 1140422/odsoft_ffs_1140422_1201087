@@ -299,11 +299,14 @@ Although some code was exercised, the lack of true unit-level focus and poor ass
 ### After Improvements
 
 JaCoCo Coverage Reports (Expected):
-- Line coverage: ≈ X% 
-- Branch coverage: ≈ Y%
+- Line coverage: ≈ 39.75%
+- Branch coverage: ≈ 11.97%
+
+![CoverageAfter.png](Diagrams/CoverageAfter.png)
+
 
 PIT Mutation Testing (Model Package):
-- Mutation coverage: 66%
+- Mutation coverage: 77%
 - Test strength: 86%
 
 ![MutationCoverageAfter.png](Diagrams/MutationCoverageAfter.png)
@@ -313,3 +316,8 @@ Test Quality:
 - Mocking frameworks were introduced to decouple dependencies.
 - Mutation testing was used iteratively to identify weak tests and strengthen them.
 - These improvements led to a substantial increase in mutation coverage, indicating that a larger portion of the codebase is now effectively validated by meaningful tests.
+
+Pipeline Tests Overview:
+
+![GraphLineBranchCoverageTest.png](Diagrams/GraphLineBranchCoverageTest.png)
+![CoverageTrend.png](Diagrams/CoverageTrend.png)
