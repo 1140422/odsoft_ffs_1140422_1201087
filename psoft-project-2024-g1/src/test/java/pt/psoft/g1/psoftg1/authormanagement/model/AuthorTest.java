@@ -7,7 +7,7 @@ import pt.psoft.g1.psoftg1.authormanagement.services.CreateAuthorRequest;
 import pt.psoft.g1.psoftg1.authormanagement.services.UpdateAuthorRequest;
 import pt.psoft.g1.psoftg1.shared.model.EntityWithPhoto;
 import pt.psoft.g1.psoftg1.shared.model.Photo;
-
+import pt.psoft.g1.psoftg1.exceptions.ConflictException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,6 +22,33 @@ class AuthorTest {
     @BeforeEach
     void setUp() {
     }
+
+    @Test
+    void shouldReturnAuthorNumberValue() {
+        Author author = new Author(validName, validBio, null);
+        Long authorNumber = author.getAuthorNumber();
+
+        assertNull(authorNumber);
+    }
+
+    @Test
+    void shouldReturnNullForNewAuthor() {
+        Author author = new Author(validName, validBio, null);
+        Long id = author.getId();
+
+        assertNull(id, "New author should have null ID before persistence");
+    }
+
+    @Test
+    void shouldCreateAuthorWithProtectedConstructor() throws Exception {
+        java.lang.reflect.Constructor<Author> constructor =
+                Author.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        Author author = constructor.newInstance();
+
+        assertNotNull(author, "Author should be created");
+    }
+
     @Test
     void ensureNameNotNull(){
         assertThrows(IllegalArgumentException.class, () -> new Author(null,validBio, null));
@@ -91,6 +118,29 @@ class AuthorTest {
         Photo photo = author.getPhoto();
         assertNotNull(photo);
         assertEquals("photoTest.jpg", photo.getPhotoFile());
+    }
+
+    @Test
+    void shouldRemovePhotoWithCorrectVersion() {
+        Author author = new Author(validName, validBio, validPhotoURI);
+        assertNotNull(author.getPhoto());
+        long currentVersion = author.getVersion();
+
+        author.removePhoto(currentVersion);
+
+        assertNull(author.getPhoto());
+    }
+
+    @Test
+    void shouldThrowConflictExceptionWithWrongVersionRemovingPhoto() {
+        Author author = new Author(validName, validBio, validPhotoURI);
+        long wrongVersion = 999L;
+
+        ConflictException exception = assertThrows(ConflictException.class,
+                () -> author.removePhoto(wrongVersion));
+
+        assertTrue(exception.getMessage().contains("version"),
+                "Exception message should mention version");
     }
 
     @Test

@@ -2,8 +2,7 @@ package pt.psoft.g1.psoftg1.authormanagement.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BioTest {
 
@@ -15,6 +14,16 @@ public class BioTest {
     @Test
     void ensureBioMustNotBeBlank() {
         assertThrows(IllegalArgumentException.class, () -> new Bio(""));
+    }
+
+    @Test
+    void shouldCreateAuthorWithProtectedConstructor() throws Exception {
+        java.lang.reflect.Constructor<Bio> constructor =
+                Bio.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        Bio bio = constructor.newInstance();
+
+        assertNotNull(bio, "Bio should be created");
     }
 
 
