@@ -133,11 +133,19 @@ Although the current thresholds are intentionally low to ensure pipeline stabili
  --- 
  
  ## Environment Architecture 
+
+For our system, we opted to create a Jenkins pipeline that handles deployments to different environments. 
+- In the development environment, the application is deployed locally by running the usual Maven commands. 
+- For staging, we deploy the application inside a Docker container. 
+- In production, we use two Docker containers: one running our Java application and another running the H2 database.
+
  | Environment | Deployment Type | Components | Port(s) | Database | Deployment Method |
  |----------------|-------------------------|---------------------------|------------|--------------------|-------------------------------------------| 
  | Development | Local (JAR via Maven) | Java App | 8081 | H2 (file mode) | Jenkins local exec |
  | Staging | Docker (single container)| Java App + H2 | 8082 | Embedded H2 | `docker-compose up psoft-staging` |
  | Production | Docker (multi-container)| Java App + DB | 8083, 8084 | Dedicated DB | `docker-compose up psoft-prod` | 
+
+
 
 ---
 
@@ -145,6 +153,53 @@ Although the current thresholds are intentionally low to ensure pipeline stabili
 
 <p align="center">
   <img src="Diagrams/DeploymentDiagram_SystemToBe.png" alt="Deployment Diagram">
+</p>
+
+To meet the project objectives, we decided to use two Jenkins instances: one running locally on a machine, and another running inside a container. 
+For the locally installed Jenkins, we had to install all required plugins manually via the command line.
+With the Jenkins container setup, however, we could predefine the plugins we wanted. 
+This approach ensures that when the Jenkins UI is first opened, all necessary plugins are already installed and configured, allowing our team to maintain a consistent setup across environments.
+
+An important configuration for both the local and containerized Jenkins instances is the environment variable:
+`-Dhudson.util.ProcessTree.disable=true"`
+
+This configuration allows Jenkins to run containers and commands within the workspace safely, ensuring that child processes do not remain running after the workspace finishes.
+
+To start using the containerized Jenkins, we ran the following command inside the psoft-project-2024-g1/jenkins folder:
+`docker-compose up -d`
+
+---
+
+#### Development Environment
+<p align="center">
+  <img src="Diagrams/DevelopmentEnvApp.png" alt="Development">
+</p>
+
+---
+
+#### Staging Environment
+<p align="center">
+  <img src="Diagrams/StagingEnvApp.png" alt="Staging">
+</p>
+
+---
+
+#### Production Environment
+
+<p align="center">
+  <img src="Diagrams/ProductionApp.png" alt="ProductionServer">
+</p>
+(Application)
+
+<p align="center">
+  <img src="Diagrams/ProductionDatabase.png" alt="ProductionDatabase">
+</p>
+(Database)
+
+#### Containers Evidence
+
+<p align="center">
+  <img src="Diagrams/ContainersRunning.png" alt="Containers">
 </p>
 
 ---
@@ -164,14 +219,44 @@ Finally, deployment stages were added, enabling automated delivery of the applic
 This enhancement allowed for faster validation of new builds in realistic environments, supporting incremental testing, pre-production validation, and smoother production rollouts.
 Although these improvements naturally increased the overall execution time of the pipeline, they provided a much higher level of confidence in both the code quality and the deployment reliability.
 
+##### Initial Pipeline:
 ![InitialPipeline.png](Diagrams/InitialPipeline.png)
-<p align="center">
-  <img src="Diagrams/StagesTimeEvidences.png" alt="Time per stages">
-</p>
 
 <p align="center">
   <img src="Diagrams/BuildTimeTrendGraph.png" alt="Build Time Graph">
 </p>
+(Graph took from Jenkins Pipeline in localhost)
+
+---
+
+##### Pipeline (26/10/2025):
+<p align="center">
+  <img src="Diagrams/StagesTimeEvidences.png" alt="Time per stages">
+</p>
+
+---
+
+##### Pipeline Final
+<p align="center">
+  <img src="Diagrams/FinalStagePipeline.png" alt="FinalStagePipeline">
+</p>
+
+<p align="center">
+  <img src="Diagrams/BuildTimeGraphContainerJenkins.png" alt="Build Time Graph Final">
+</p>
+
+(Graph took from Jenkins Pipeline in container)
+
+---
+
+One important remark, previously, our mutation tests took an average of **about 9 minutes and 16 seconds**. 
+By restricting the tests to the domain layer, the execution time dropped to just **1 minute and 19 seconds**, representing an approximately **86% reduction**. 
+This dramatically improved the speed and efficiency of our CI/CD pipeline.
+
+<p align="center">
+  <img src="Diagrams/PipelineMutationTestTime.png" alt="TimeSaved">
+</p>
+
 
 
 ---
