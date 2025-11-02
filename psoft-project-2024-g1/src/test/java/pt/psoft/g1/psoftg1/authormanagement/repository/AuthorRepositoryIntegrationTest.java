@@ -40,4 +40,54 @@ public class AuthorRepositoryIntegrationTest {
         assertThat(list.get(0).getName())
                 .isEqualTo(alex.getName());
     }
+
+    @Test
+    void whenFindByNonExistentName_thenReturnEmpty() {
+        // given
+        Author alex = new Author("Alex", "Bio", null);
+        entityManager.persist(alex);
+        entityManager.flush();
+
+        // when
+        List<Author> list = authorRepository.searchByNameName("NonExistent");
+
+        // then
+        assertThat(list).isEmpty();
+    }
+
+    @Test
+    void whenMultipleAuthorsWithSimilarNames_thenReturnAll() {
+        // given
+        Author john1 = new Author("John Smith", "First John", null);
+        Author john2 = new Author("John Doe", "Second John", null);
+        Author jane = new Author("Jane Doe", "Not John", null);
+
+        entityManager.persist(john1);
+        entityManager.persist(john2);
+        entityManager.persist(jane);
+        entityManager.flush();
+
+        // when - assuming partial match works
+        List<Author> johns = authorRepository.searchByNameNameStartsWith("John");
+
+        // then
+        assertThat(johns).hasSize(2);
+        assertThat(johns).extracting(Author::getName)
+                .contains("John Smith", "John Doe");
+    }
+
+    @Test
+    void whenNameContainsSpecialCharacters_thenSearchWorks() {
+        // given
+        Author author = new Author("O'Connor-Smith", "Irish author", null);
+        entityManager.persist(author);
+        entityManager.flush();
+
+        // when
+        List<Author> result = authorRepository.searchByNameName("O'Connor-Smith");
+
+        // then
+        assertThat(result).isNotEmpty();
+        assertThat(result.get(0).getName()).isEqualTo("O'Connor-Smith");
+    }
 }
