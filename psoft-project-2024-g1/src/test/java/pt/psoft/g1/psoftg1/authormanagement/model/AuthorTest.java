@@ -30,6 +30,7 @@ class AuthorTest {
 
         assertNull(authorNumber);
     }
+
     @Test
     void shouldReturnNullForNewAuthor() {
         Author author = new Author(validName, validBio, null);
