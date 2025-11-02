@@ -32,9 +32,9 @@ pipeline {
                 dir('psoft-project-2024-g1') {
                     script {
                         if (isUnix()) {
-                            sh 'mvn clean package -DskipTests'
+                            sh 'mvn clean compile -DskipTests'
                         } else {
-                            bat 'mvn clean package -DskipTests'
+                            bat 'mvn clean compile -DskipTests'
                         }
                     }
                 }
@@ -59,6 +59,20 @@ pipeline {
                         checkStyle(pattern: 'psoft-project-2024-g1/target/checkstyle-result.xml'),
                         spotBugs(pattern: 'psoft-project-2024-g1/target/spotbugsXml.xml')
                     ]
+                }
+            }
+        }
+
+        stage('Packaging') {
+            steps {
+                dir('psoft-project-2024-g1') {
+                    script {
+                        if (isUnix()) {
+                            sh 'mvn package -DskipTests'
+                        } else {
+                            bat 'mvn package -DskipTests'
+                        }
+                    }
                 }
             }
         }

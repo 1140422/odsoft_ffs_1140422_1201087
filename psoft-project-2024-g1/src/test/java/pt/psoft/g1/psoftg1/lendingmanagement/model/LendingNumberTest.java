@@ -51,4 +51,31 @@ class LendingNumberTest {
         assertThrows(IllegalArgumentException.class, () -> new LendingNumber(LocalDate.now().getYear()+1,1));
     }
 
+    @Test
+    void ensureYear1970IsAccepted() {
+        assertDoesNotThrow(() -> new LendingNumber(1970, 1));
+    }
+
+    @Test
+    void ensureCurrentYearIsAccepted() {
+        int currentYear = LocalDate.now().getYear();
+        assertDoesNotThrow(() -> new LendingNumber(currentYear, 1));
+    }
+
+    @Test
+    void ensureSequentialZeroIsAccepted() {
+        assertDoesNotThrow(() -> new LendingNumber(0));
+        assertDoesNotThrow(() -> new LendingNumber(LocalDate.now().getYear(), 0));
+    }
+
+    @Test
+    void ensureSequentialNegativeThrowsExceptionInConstructorWithYear() {
+        assertThrows(IllegalArgumentException.class, () -> new LendingNumber(2024, -5));
+    }
+
+    @Test
+    void ensureSequentialNegativeThrowsExceptionInConstructorWithoutYear() {
+        assertThrows(IllegalArgumentException.class, () -> new LendingNumber(-5));
+    }
+
 }
