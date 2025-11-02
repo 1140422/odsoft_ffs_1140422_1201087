@@ -200,11 +200,15 @@
 				<artifactId>pitest-maven</artifactId>
 				<version>1.15.0</version>
 				<configuration>
-					<!-- Classes alvo para mutação -->
-					<targetClasses>
-						<param>pt.psoft.g1.*</param>
-					</targetClasses>
+                    <!-- Classes onde o PIT vai criar mutações -->
+                    <targetClasses>
+                        <param>pt.psoft.g1.psoftg1.*.model.*</param>
+                    </targetClasses>
 
+                    <!-- Testes que o PIT vai executar -->
+                    <targetTests>
+                        <param>pt.psoft.g1.psoftg1.**.model.*Test</param>
+                    </targetTests>
 					<!-- Excluir todos os testes de integração -->
 					<excludedTestClasses>
 						<param>**/*IntegrationTest*</param>

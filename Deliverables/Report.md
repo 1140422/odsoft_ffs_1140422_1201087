@@ -27,44 +27,57 @@ The pipeline automates build, testing (unit, integration, mutation), static anal
  
  ### 2. Build - Navigates to the project directory `psoft-project-2024-g1`. 
  - Builds the application using: ```bash mvn clean package -DskipTests ``` 
- - Produces a JAR file at: ``` psoft-project-2024-g1/target/psoft-g1-0.0.1-SNAPSHOT.jar ``` 
- 
+
  ---
  
  ### 3. Static Code Analysis - Runs **Checkstyle** and **SpotBugs**: 
- ```bash mvn checkstyle:check spotbugs:spotbugs -DskipTests ``` 
+ Executes ```bash mvn checkstyle:check spotbugs:spotbugs -DskipTests ```
+
+**Checkstyle** – Analyzes the source code for style guideline compliance (e.g., naming conventions, formatting, and best practices).
+
+**SpotBugs** – Scans the bytecode to identify potential bugs, performance issues, and bad practices in Java code.
 
  Reports are recorded using Jenkins’ **recordIssues** plugin:
  - `checkstyle-result.xml` 
  - `spotbugsXml.xml` 
  
  --- 
+
+### 4. Packaging
+- Executes ```bash mvn package -DskipTests ```
+- Produces a JAR file at: ``` psoft-project-2024-g1/target/psoft-g1-0.0.1-SNAPSHOT.jar ```
+
+ --- 
  
- ### 4. Unit Tests 
+ ### 5. Unit Tests 
  
  - Executes: ```bash mvn test ``` 
  - Collects reports from: ``` target/surefire-reports/*.xml ``` 
  - Measures code coverage with **JaCoCo**, enforcing quality gates: 
  - Line coverage ≥ 10% (unstable below threshold) 
  - Branch coverage ≥ 2% (unstable below threshold) 
- 
+
+Although the current thresholds are intentionally low to ensure pipeline stability during early development, ideal quality gates for a mature project would be:
+- Line coverage ≥ 80%
+- Branch coverage ≥ 70%
  --- 
  
- ### 5. Mutation Testing 
+ ### 6. Mutation Testing 
  - Executes: ```bash mvn pitest:mutationCoverage ``` 
+ - Measures code coverage with **PIT** plugin
  - Generates **mutation testing reports** in: ``` target/pit-reports/index.html ``` 
- - Jenkins publishes them as an HTML report. 
+ - Jenkins publishes them as an HTML report
  
  ---
  
- ### 6. Integration Tests 
+ ### 7. Integration Tests 
  - Runs: ```bash mvn verify ``` 
  - Collects results from: ``` target/failsafe-reports/*.xml ``` 
  - Validates end-to-end logic and API integration. 
  
  --- 
  
- ### 7. Deployment Stages 
+ ### 8. Deployment Stages 
  
  #### **Deploy DEV** 
  
@@ -138,13 +151,28 @@ The pipeline automates build, testing (unit, integration, mutation), static anal
 
 ### Build Time Evidences
 
+At the beginning of the development process, the continuous integration pipeline included only the essential stages: **Checkout**, **Build**, and **Unit Test**.
+This setup ensured that the project could be successfully compiled and that the basic unit tests ran correctly, providing minimal code validation with each commit.
+As shown in figure below, the total execution time of this initial pipeline was approximately **1 minute and 23 seconds**, reflecting a simple and lightweight structure suitable for the early phases of the project.
+However, this configuration presented significant limitations in terms of test quality and coverage, as it did not include static analysis, coverage measurement, or mutation testing.
+
+Over time, the pipeline evolved significantly, integrating new stages such as **Static Code Analysis**, **Code Coverage Measurement**, and **Mutation Testing**.
+These additions introduced deeper quality checks, allowing the detection of stylistic inconsistencies, potential bugs, and weaknesses in the test suite.
+Consequently, the pipeline transitioned from a simple verification tool into a more complete Continuous Integration and Quality Assurance process.
+
+Finally, deployment stages were added, enabling automated delivery of the application to different environments — **DEV**, **STAGING**, and **PRODUCTION** — using a mix of direct execution and Docker Compose.
+This enhancement allowed for faster validation of new builds in realistic environments, supporting incremental testing, pre-production validation, and smoother production rollouts.
+Although these improvements naturally increased the overall execution time of the pipeline, they provided a much higher level of confidence in both the code quality and the deployment reliability.
+
+![InitialPipeline.png](Diagrams/InitialPipeline.png)
+<p align="center">
+  <img src="Diagrams/StagesTimeEvidences.png" alt="Time per stages">
+</p>
+
 <p align="center">
   <img src="Diagrams/BuildTimeTrendGraph.png" alt="Build Time Graph">
 </p>
 
-<p align="center">
-  <img src="Diagrams/StagesTimeEvidences.png" alt="Time per stages">
-</p>
 
 ---
 
@@ -155,3 +183,48 @@ The pipeline automates build, testing (unit, integration, mutation), static anal
 | Unit Tests | JUnit | Surefire XML | `junit` | | Coverage | JaCoCo | HTML + XML | `recordCoverage` |
 | Mutation Testing | PIT | HTML report | `publishHTML` |
 | Integration Tests | Failsafe | XML | `junit` | 
+
+---
+
+## Test Health: Quantity and Quality
+
+This section evaluates the overall health of the test suite before and after improvements, focusing on both quantity (coverage metrics) and quality (test design and effectiveness).
+
+### Before Improvements
+
+JaCoCo Coverage Reports:
+- Line coverage: 20.15%
+- Branch coverage: 4.65%
+
+![CoverageBefore.png](Diagrams/CoverageBefore.png)
+
+PIT Mutation Testing (Model Package):
+- Mutation coverage: 39%
+- Test strength: 72%
+
+![MutationCoverageBefore.png](Diagrams/MutationCoverageBefore.png)
+
+Test Quality:
+- Existing tests often covered multiple classes simultaneously, rather than focusing on a single System Under Test (SUT).
+- Tests lacked proper isolation of dependencies, which led to inconsistent and unreliable outcomes.
+
+- As a result, the test suite provided low confidence in software correctness.
+Although some code was exercised, the lack of true unit-level focus and poor assertion depth limited the suite’s diagnostic power.
+
+### After Improvements
+
+JaCoCo Coverage Reports (Expected):
+- Line coverage: ≈ X% 
+- Branch coverage: ≈ Y%
+
+PIT Mutation Testing (Model Package):
+- Mutation coverage: 66%
+- Test strength: 86%
+
+![MutationCoverageAfter.png](Diagrams/MutationCoverageAfter.png)
+
+Test Quality:
+- Each test now targets a single SUT, ensuring proper unit isolation and more consistent results.
+- Mocking frameworks were introduced to decouple dependencies.
+- Mutation testing was used iteratively to identify weak tests and strengthen them.
+- These improvements led to a substantial increase in mutation coverage, indicating that a larger portion of the codebase is now effectively validated by meaningful tests.
