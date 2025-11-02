@@ -7,6 +7,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GenreTest {
 
+    private static final String VALID_GENRE = "Science Fiction";
+    private static final int GENRE_MAX_LENGTH = 100;
+
     @Test
     void ensureGenreMustNotBeNull() {
         assertThrows(IllegalArgumentException.class, () -> new Genre(null));
@@ -46,6 +49,59 @@ class GenreTest {
     void ensureGenreIsSet() {
         final var genre = new Genre("Some genre");
         assertEquals("Some genre", genre.toString());
+    }
+
+    @Test
+    void ensureGenreGet() {
+        final var genre = new Genre("Some genre");
+        assertEquals("Some genre", genre.getGenre());
+    }
+
+    @Test
+    void shouldKillWrongExceptionType() {
+        // Mutation: IllegalArgumentException → RuntimeException
+        try {
+            new Genre(null);
+            fail("Should have thrown exception");
+        } catch (Exception e) {
+            assertEquals(IllegalArgumentException.class, e.getClass(),
+                    "Must throw IllegalArgumentException specifically");
+        }
+    }
+
+    @Test
+    void shouldKillBlankCheckRemoval() {
+        // Various blank inputs must fail
+        assertThrows(IllegalArgumentException.class, () -> new Genre(""));
+        assertThrows(IllegalArgumentException.class, () -> new Genre(" "));
+        assertThrows(IllegalArgumentException.class, () -> new Genre("  "));
+        assertThrows(IllegalArgumentException.class, () -> new Genre("\t"));
+        assertThrows(IllegalArgumentException.class, () -> new Genre("\n"));
+    }
+
+    @Test
+    void shouldKillTNullEmptyMutation() {
+        // Mutation: return genre → return null
+        Genre genre = new Genre(VALID_GENRE);
+        String result = genre.toString();
+
+        assertNotNull(result, "toString() must not return null");
+        assertEquals(VALID_GENRE, result);
+
+        assertFalse(result.isEmpty(), "toString() must not return empty string");
+        assertEquals(VALID_GENRE, result);
+
+        assertNotNull(result, "getGenre() must not return null");
+        assertEquals(VALID_GENRE, result);
+    }
+
+    @Test
+    void shouldAccessProtectedConstructor() throws Exception {
+        var constructor = Genre.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        Genre genre = constructor.newInstance();
+
+        assertNotNull(genre);
     }
 
 }
