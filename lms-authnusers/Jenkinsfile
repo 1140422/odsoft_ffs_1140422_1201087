@@ -7,8 +7,8 @@ pipeline {
   }
 
   environment {
-    APP_NAME = "lms-books"
-    DOCKER_IMAGE = "lms-books"
+    APP_NAME = "lms-authnusers"
+    DOCKER_IMAGE = "lms-authnusers"
     DOCKER_TAG = "latest"
   }
 
@@ -22,7 +22,7 @@ pipeline {
 
             stage('Build') {
                 steps {
-                    dir('lms-books') {
+                    dir('lms-authnusers') {
                         script {
                             if (isUnix()) {
                                 sh 'mvn clean compile -DskipTests'
@@ -36,7 +36,7 @@ pipeline {
 
             stage('Static Code Analysis') {
                 steps {
-                    dir('lms-books') {
+                    dir('lms-authnusers') {
                         script {
                             if (isUnix()) {
                                 sh 'mvn checkstyle:check spotbugs:spotbugs -DskipTests'
@@ -49,8 +49,8 @@ pipeline {
                 post {
                     always {
                         recordIssues tools: [
-                            checkStyle(pattern: 'lms-books/target/checkstyle-result.xml'),
-                            spotBugs(pattern: 'lms-books/target/spotbugsXml.xml')
+                            checkStyle(pattern: 'lms-authnusers/target/checkstyle-result.xml'),
+                            spotBugs(pattern: 'lms-authnusers/target/spotbugsXml.xml')
                         ]
                     }
                 }
@@ -58,7 +58,7 @@ pipeline {
 
             stage('Packaging') {
                 steps {
-                    dir('lms-books') {
+                    dir('lms-authnusers') {
                         script {
                             if (isUnix()) {
                                 sh 'mvn package -DskipTests'
@@ -72,7 +72,7 @@ pipeline {
 
             stage('Unit Tests') {
                 steps {
-                    dir('lms-books') {
+                    dir('lms-authnusers') {
                         script {
                             if (isUnix()) {
                                 sh 'mvn test'
@@ -84,7 +84,7 @@ pipeline {
                 }
                 post {
                     always {
-                        junit 'lms-books/target/surefire-reports/*.xml'
+                        junit 'lms-authnusers/target/surefire-reports/*.xml'
                         recordCoverage(tools: [[parser: 'JACOCO']],
                             id: 'jacoco', name: 'JaCoCo Coverage',
                             sourceCodeRetention: 'EVERY_BUILD',
@@ -98,7 +98,7 @@ pipeline {
 
             stage('Mutation Tests') {
                 steps {
-                    dir('lms-books') {
+                    dir('lms-authnusers') {
                         script {
                             if (isUnix()) {
                                 sh 'mvn pitest:mutationCoverage'
@@ -113,7 +113,7 @@ pipeline {
                         publishHTML(target: [
                             allowMissing: true,
                             keepAll: true,
-                            reportDir: 'lms-books/target/pit-reports',
+                            reportDir: 'lms-authnusers/target/pit-reports',
                             reportFiles: 'index.html',
                             reportName: 'Mutation Testing Report'
                         ])
