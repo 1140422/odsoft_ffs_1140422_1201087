@@ -121,6 +121,29 @@ pipeline {
         }
     }
 
+    stage('CDC Tests') {
+      steps {
+        dir('lms-books') {
+          script {
+            if (isUnix()) {
+              sh 'mvn -Dtest=BooksCDCDefinitionTest test'
+              sh 'mvn -Dit.test=BooksProducerCDCIT verify -DskipTests=true -DskipIT=false'
+            } else {
+              bat 'mvn -Dtest=BooksCDCDefinitionTest test'
+              bat 'mvn -Dit.test=BooksProducerCDCIT verify -DskipTests=true -DskipIT=false'
+            }
+          }
+        }
+      }
+      post {
+        always {
+          archiveArtifacts artifacts: 'lms-books/target/pacts/**',
+                           fingerprint: true,
+                           allowEmptyArchive: true
+        }
+      }
+    }
+
     stage('Container image build') {
         steps {
             dir('lms-books') {
