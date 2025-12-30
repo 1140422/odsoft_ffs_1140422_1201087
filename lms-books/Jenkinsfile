@@ -157,6 +157,33 @@ pipeline {
             }
         }
     }
+
+    stage('Notify for Manual Approval') {
+      steps {
+        emailext(
+          to: '1201087@isep.ipp.pt',
+          subject: "Jenkins Approval Required: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+          body: """
+            The build is ready for DEPLOYMENT (Service B - LMS Books).
+
+            Job: ${env.JOB_NAME}
+            Build: #${env.BUILD_NUMBER}
+            Link: ${env.BUILD_URL}
+
+            Please approve the deployment in Jenkins (manual input step).
+            """
+        )
+      }
+    }
+
+    stage('Manual Approval (Service B)') {
+      steps {
+        input(
+          message: "Approve deployment of Service B (LMS Books)?",
+          ok: "Approve and continue"
+        )
+      }
+    }
   }
 
   post {
