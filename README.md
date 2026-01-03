@@ -13,5 +13,5 @@ The project is being developed by the following students:
 + Tiago Bento [1201087]
 
 ## Report
-Link to Report Project 1: [Report Project1](/Deliverables/Report.md) 
-Link to System as Is Report: [System as Is](/Deliverables/System%20As%20Is.md) 
+Link to Report Project 1: [Report Project1](/Project1/Deliverables/Report.md) 
+Link to System as Is Report: [System as Is](/Project2/Deliverables/System%20As%20Is.md) 
