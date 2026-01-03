@@ -22,7 +22,7 @@ pipeline {
 
             stage('Build') {
                 steps {
-                    dir('lms-authnusers') {
+                    dir('Project2/lms-authnusers') {
                         script {
                             if (isUnix()) {
                                 sh 'mvn clean compile -DskipTests'
@@ -36,7 +36,7 @@ pipeline {
 
             stage('Static Code Analysis') {
                 steps {
-                    dir('lms-authnusers') {
+                    dir('Project2/lms-authnusers') {
                         script {
                             if (isUnix()) {
                                 sh 'mvn checkstyle:check spotbugs:spotbugs -DskipTests'
@@ -49,8 +49,8 @@ pipeline {
                 post {
                     always {
                         recordIssues tools: [
-                            checkStyle(pattern: 'lms-authnusers/target/checkstyle-result.xml'),
-                            spotBugs(pattern: 'lms-authnusers/target/spotbugsXml.xml')
+                            checkStyle(pattern: 'Project2/lms-authnusers/target/checkstyle-result.xml'),
+                            spotBugs(pattern: 'Project2/lms-authnusers/target/spotbugsXml.xml')
                         ]
                     }
                 }
@@ -58,7 +58,7 @@ pipeline {
 
             stage('Packaging') {
                 steps {
-                    dir('lms-authnusers') {
+                    dir('Project2/lms-authnusers') {
                         script {
                             if (isUnix()) {
                                 sh 'mvn package -DskipTests'
@@ -72,7 +72,7 @@ pipeline {
 
             stage('Unit Tests') {
                 steps {
-                    dir('lms-authnusers') {
+                    dir('Project2/lms-authnusers') {
                         script {
                             if (isUnix()) {
                                 sh 'mvn test'
@@ -84,7 +84,7 @@ pipeline {
                 }
                 post {
                     always {
-                        junit 'lms-authnusers/target/surefire-reports/*.xml'
+                        junit 'Project2/lms-authnusers/target/surefire-reports/*.xml'
                         recordCoverage(tools: [[parser: 'JACOCO']],
                             id: 'jacoco', name: 'JaCoCo Coverage',
                             sourceCodeRetention: 'EVERY_BUILD',
@@ -98,7 +98,7 @@ pipeline {
 
             stage('Mutation Tests') {
                 steps {
-                    dir('lms-authnusers') {
+                    dir('Project2/lms-authnusers') {
                         script {
                             if (isUnix()) {
                                 sh 'mvn pitest:mutationCoverage'
@@ -113,7 +113,7 @@ pipeline {
                         publishHTML(target: [
                             allowMissing: true,
                             keepAll: true,
-                            reportDir: 'lms-authnusers/target/pit-reports',
+                            reportDir: 'Project2/lms-authnusers/target/pit-reports',
                             reportFiles: 'index.html',
                             reportName: 'Mutation Testing Report'
                         ])
@@ -123,7 +123,7 @@ pipeline {
 
         stage('Container image build') {
             steps {
-                dir('lms-authnusers') {
+                dir('Project2/lms-authnusers') {
                     script {
                         if (isUnix()) {
                           sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
@@ -133,7 +133,7 @@ pipeline {
                     }
                 }
             }
-        }
+        }       
   }
 
   post {
