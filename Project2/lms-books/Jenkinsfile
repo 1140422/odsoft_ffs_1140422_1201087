@@ -50,8 +50,8 @@ pipeline {
         post {
             always {
                 recordIssues tools: [
-                    checkStyle(pattern: 'lms-books/target/checkstyle-result.xml'),
-                    spotBugs(pattern: 'lms-books/target/spotbugsXml.xml')
+                    checkStyle(pattern: 'Project2/lms-books/target/checkstyle-result.xml'),
+                    spotBugs(pattern: 'Project2/lms-books/target/spotbugsXml.xml')
                 ]
             }
         }
@@ -85,7 +85,7 @@ pipeline {
         }
         post {
             always {
-                junit 'lms-books/target/surefire-reports/*.xml'
+                junit 'Project2/lms-books/target/surefire-reports/*.xml'
                 recordCoverage(tools: [[parser: 'JACOCO']],
                     id: 'jacoco', name: 'JaCoCo Coverage',
                     sourceCodeRetention: 'EVERY_BUILD',
@@ -114,7 +114,7 @@ pipeline {
                 publishHTML(target: [
                     allowMissing: true,
                     keepAll: true,
-                    reportDir: 'lms-books/target/pit-reports',
+                    reportDir: 'Project2/lms-books/target/pit-reports',
                     reportFiles: 'index.html',
                     reportName: 'Mutation Testing Report'
                 ])
@@ -138,7 +138,7 @@ pipeline {
       }
       post {
         always {
-          archiveArtifacts artifacts: 'lms-books/target/pacts/**',
+          archiveArtifacts artifacts: 'Project2/lms-books/target/pacts/**',
                            fingerprint: true,
                            allowEmptyArchive: true
         }
