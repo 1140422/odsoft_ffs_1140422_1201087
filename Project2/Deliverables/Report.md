@@ -27,4 +27,10 @@ In this stage the application is containerized with the latest tag
 ### Docker Login and Image Push
 Through the pipeline we push the image to dockerhub, so it is public and we can retrieve it in the latest stages for production.
 
-### Staging Deployment 
+### Staging Deployment (Local)
+With Docker Compose we deploy the application locally together with its dependencies, like Postgres and RabbitMQ, here we stop the previous containers rebuild and start the new services
+
+### (Books service only) Email and manual approval
+In this stage only for 
+
+### Remote Deployment Via SSH
