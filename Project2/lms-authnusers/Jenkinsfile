@@ -23,7 +23,7 @@ pipeline {
 
             stage('Build') {
                 steps {
-                    dir(${APP_PATH}) {
+                    dir("${APP_PATH}") {
                         script {
                             if (isUnix()) {
                                 sh 'mvn clean compile -DskipTests'
