@@ -139,6 +139,7 @@ pipeline {
 
         stage('Docker Login & Push') {
             steps {
+                sh "docker build -t $DOCKER_IMAGE:latest ."
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub-credentials',
                     usernameVariable: 'DOCKER_USER',
