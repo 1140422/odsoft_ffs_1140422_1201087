@@ -1,7 +1,7 @@
 
 services:
     users:
-        image: 1140422/lmusers:latest
+        image: 1140422/lmsusers:latest
         container_name: users_in_lms_network
         ports:
             - "8084:8080"
