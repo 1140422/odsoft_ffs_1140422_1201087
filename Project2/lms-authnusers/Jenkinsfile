@@ -9,7 +9,8 @@ pipeline {
   environment {
     APP_NAME = "lms-authnusers"
     DOCKER_IMAGE = "lms-authnusers"
-    DOCKER_TAG = "latest"
+    DOCKER_REPO = "1140422/lms-authnusers"
+    DOCKER_TAG = "${BUILD_NUMBER}"
   }
 
   stages {
@@ -133,7 +134,25 @@ pipeline {
                     }
                 }
             }
-        }       
+        }
+
+        stage('Docker Login & Push') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-credentials',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh """
+                        docker login -u $DOCKER_USER -p $DOCKER_PASS
+                        docker tag lmsusers:latest $DOCKER_REPO:$DOCKER_TAG
+                        docker tag lmsusers:latest $DOCKER_REPO:latest
+                        docker push $DOCKER_REPO:$DOCKER_TAG
+                        docker push $DOCKER_REPO:latest
+                    """
+                }
+            }
+        }
   }
 
   post {
