@@ -5,18 +5,18 @@ FROM maven:3.8.8-eclipse-temurin-21-alpine AS build
 WORKDIR /app
 
 # Copy the pom.xml and download dependencies
-COPY ../pom.xml .
+COPY pom.xml .
 RUN mvn dependency:go-offline
 
 # Copy the rest of the project files
-COPY ../src ./src
+COPY src ./src
 
 # Package the application
-RUN mvn package
+RUN mvn clean package -DskipTests
 
 
 # Run the app using the JAR (if it is a standalone application)
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jre-jammy
 
 WORKDIR /app
 

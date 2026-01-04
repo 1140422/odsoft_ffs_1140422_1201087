@@ -7,9 +7,9 @@ pipeline {
   }
 
   environment {
-    APP_NAME = "lms-authnusers"
-    DOCKER_IMAGE = "lms-authnusers"
-    DOCKER_REPO = "1140422/lms-authnusers"
+    APP_PATH = "Project2/lms-authnusers"
+    DOCKER_IMAGE = "lmsusers"
+    DOCKER_REPO = "1140422/lmsusers"
     DOCKER_TAG = "${BUILD_NUMBER}"
   }
 
@@ -23,7 +23,7 @@ pipeline {
 
             stage('Build') {
                 steps {
-                    dir('Project2/lms-authnusers') {
+                    dir(${APP_PATH}) {
                         script {
                             if (isUnix()) {
                                 sh 'mvn clean compile -DskipTests'
@@ -154,13 +154,40 @@ pipeline {
             }
         }
 
+        stage('Staging Deployment (Local)') {
+            steps {
+                dir('Project2/lms-authnusers') {
+                    sh """
+                        echo "Stopping any existing staging containers..."
+                        docker compose down || true
+                        
+                        echo "Starting staging environment locally..."
+                        docker compose up -d --build
+                        
+                        echo "Listing running containers for staging..."
+                        docker ps
+                    """
+                }
+            }
+            post {
+                always {
+                    echo "Local staging deployment attempted."
+                }
+                success {
+                    echo "Local staging environment is up and running!"
+                }
+                failure {
+                    echo "Local staging deployment failed — check logs."
+                }
+            }
+        }
+
         stage('Deploy to Remote Server') {
             steps {
                 sshagent(credentials: ['lms-remote-ssh']) {
                 sh """
                     scp -P 10819 -o StrictHostKeyChecking=no Project2/lms-authnusers/docker-compose.yml root@vsgate-ssh.dei.isep.ipp.pt:/opt/lms/docker-compose.yml
                     ssh -o StrictHostKeyChecking=no -p 10819 root@vsgate-ssh.dei.isep.ipp.pt << 'EOF'
-                    docker network create lms_network
                     cd /opt/lms
                     docker-compose pull
                     docker-compose up -d
