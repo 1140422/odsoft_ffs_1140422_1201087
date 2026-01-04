@@ -20,3 +20,11 @@ Code coverage is measured using JaCoCo, with defined quality gates, like line co
 ### Mutation Testing
 Mutation testing is performed using PIT, which validates the effectiveness of the test suite by introducing artificial faults.
 An HTML report is published.
+
+### Docker Image build
+In this stage the application is containerized with the latest tag
+
+### Docker Login and Image Push
+Through the pipeline we push the image to dockerhub, so it is public and we can retrieve it in the latest stages for production.
+
+### Staging Deployment 
