@@ -128,6 +128,7 @@ pipeline {
                     script {
                         if (isUnix()) {
                           sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                          sh "docker build -t $DOCKER_IMAGE:latest ."
                         } else {
                             bat "docker build -t %DOCKER_IMAGE%:%DOCKER_TAG% ."
                         }
