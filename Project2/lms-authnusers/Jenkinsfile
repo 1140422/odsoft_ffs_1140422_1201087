@@ -187,11 +187,7 @@ pipeline {
                 sshagent(credentials: ['home-server-ssh']) {
                 sh """
                     scp -o StrictHostKeyChecking=no Project2/lms-authnusers/docker-compose.prod.yml nuno@192.168.1.200:/opt/lms/docker-compose.prod.yml
-                    ssh -o StrictHostKeyChecking=no nuno@192.168.1.200 << 'EOF'
-                    cd /opt/lms
-                    docker compose -f docker-compose.prod.yml pull
-                    docker compose -f docker-compose.prod.yml up -d
-                    EOF
+                    ssh -o StrictHostKeyChecking=no nuno@192.168.1.200 'cd /opt/lms && docker compose -f docker-compose.prod.yml pull && docker compose -f docker-compose.prod.yml up -d'
                 """
                 }
             }
