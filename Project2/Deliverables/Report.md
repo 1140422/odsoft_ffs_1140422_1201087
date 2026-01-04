@@ -21,7 +21,7 @@ The analysis reports are collected and published by Jenkins.
 Unit tests are executed using JUnit, and the test results are automatically published in Jenkins.
 Code coverage is measured with JaCoCo, using defined quality gates for line and branch coverage. If the thresholds are not met, the build is marked as unstable.
 
-![Coverage.png](images/img.png)
+![Coverage.png](images/Coverage.png)
 
 ### Mutation Testing
 Mutation testing is performed using PIT, which validates the effectiveness of the test suite by introducing artificial faults.
