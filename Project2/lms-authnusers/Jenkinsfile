@@ -186,11 +186,11 @@ pipeline {
             steps {
                 sshagent(credentials: ['lms-remote-ssh']) {
                 sh """
-                    scp -P 10819 -o StrictHostKeyChecking=no Project2/lms-authnusers/docker-compose.yml root@vsgate-ssh.dei.isep.ipp.pt:/opt/lms/docker-compose.yml
+                    scp -P 10819 -o StrictHostKeyChecking=no Project2/lms-authnusers/docker-compose.prod.yml root@vsgate-ssh.dei.isep.ipp.pt:/opt/lms/docker-compose.prod.yml
                     ssh -o StrictHostKeyChecking=no -p 10819 root@vsgate-ssh.dei.isep.ipp.pt << 'EOF'
                     cd /opt/lms
-                    docker-compose pull
-                    docker-compose up -d
+                    docker-compose -f docker-compose.prod.yml pull
+                    docker-compose -f docker-compose.prod.yml up -d
                     EOF
                 """
                 }
