@@ -153,6 +153,21 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy to Remote Server') {
+            steps {
+                sshagent(credentials: ['lms-remote-ssh']) {
+                sh """
+                    scp -P 10819 -o StrictHostKeyChecking=no docker-compose.yml root@vsgate-ssh.dei.isep.ipp.pt:/opt/lms/docker-compose.yml
+                    ssh -o StrictHostKeyChecking=no -p 10819 root@vsgate-ssh.dei.isep.ipp.pt << 'EOF'
+                    cd /opt/lms
+                    docker-compose pull
+                    docker-compose up -d
+                    EOF
+                """
+                }
+            }
+        }
   }
 
   post {
