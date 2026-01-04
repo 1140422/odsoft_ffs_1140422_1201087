@@ -9,8 +9,9 @@ pipeline {
   environment {
     APP_PATH = "Project2/lms-books"
     APP_NAME = "lms-books"
-    DOCKER_IMAGE = "lms-books"
-    DOCKER_TAG = "latest"
+    DOCKER_IMAGE = "lmsbooks"
+    DOCKER_REPO = "1140422/lmsbooks"
+    DOCKER_TAG = "${BUILD_NUMBER}"
   }
 
   stages {
@@ -159,6 +160,52 @@ pipeline {
         }
     }
 
+    stage('Docker Login & Push') {
+        steps {
+            withCredentials([usernamePassword(
+                credentialsId: 'dockerhub-credentials',
+                usernameVariable: 'DOCKER_USER',
+                passwordVariable: 'DOCKER_PASS'
+            )]) {
+                sh """
+                    docker login -u $DOCKER_USER -p $DOCKER_PASS
+                    docker tag $DOCKER_IMAGE:latest $DOCKER_REPO:$DOCKER_TAG
+                    docker tag $DOCKER_IMAGE:latest $DOCKER_REPO:latest
+                    docker push $DOCKER_REPO:$DOCKER_TAG
+                    docker push $DOCKER_REPO:latest
+                """
+            }
+        }
+    }
+
+    stage('Staging Deployment (Local)') {
+        steps {
+            dir("${APP_PATH}") {
+                sh """
+                    echo "Stopping any existing staging containers..."
+                    docker compose down || true
+                    
+                    echo "Starting staging environment locally..."
+                    docker compose up -d --build
+                    
+                    echo "Listing running containers for staging..."
+                    docker ps
+                """
+            }
+        }
+        post {
+            always {
+                echo "Local staging deployment attempted."
+            }
+            success {
+                echo "Local staging environment is up and running!"
+            }
+            failure {
+                echo "Local staging deployment failed — check logs."
+            }
+        }
+    }
+
     stage('Notify for Manual Approval') {
       steps {
         emailext(
@@ -184,6 +231,17 @@ pipeline {
           ok: "Approve and continue"
         )
       }
+    }
+
+    stage('Deploy to Remote Server') {
+        steps {
+            sshagent(credentials: ['home-server-ssh']) {
+            sh """
+                scp -o StrictHostKeyChecking=no Project2/lms-authnusers/docker-compose.yml nuno@192.168.1.200:/opt/lms/docker-compose.yml
+                ssh -o StrictHostKeyChecking=no nuno@192.168.1.200 'cd /opt/lms && docker compose -f docker-compose.yml pull && docker compose -f docker-compose.yml up -d'
+            """
+            }
+        }
     }
   }
 
