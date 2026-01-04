@@ -43,6 +43,12 @@ In this stage the application is containerized with the latest tag
 ### Docker Login and Image Push
 Through the pipeline we push the image to dockerhub, so it is public and we can retrieve it in the latest stages for production.
 
+DockerHub lmsbooks
+![DockerHub_lmsbooks.png](images/DockerHub_lmsbooks.png)
+
+DockerHub lmsusers
+![DockerHub_lmsusers.png](images/DockerHub_lmsusers.png)
+
 ### Staging Deployment (Local)
 With Docker Compose we deploy the application locally together with its dependencies, like Postgres and RabbitMQ, here we stop the previous containers rebuild and start the new services
 
@@ -57,10 +63,42 @@ After all build, test stages complete successfully, the pipeline sends an automa
 
 ![EmailNotification.png](images/EmailNotification.png)
 
+![](images/ManualGate.png)
+
+---
 
 ### Remote Deployment Via SSH
-In this stage the group tried to do a deployment in DEI remote servers, however we were not successfull due to permissions on docker, the server denied us to execute any image:
-IMAGE
+During this stage, the group initially attempted to deploy the application to the DEI remote servers. 
+![](images/DEI_Server.png)
 
-For this reason, we decided to use a home server from one team element, this server is a Ubuntu LTS built on an old laptop, openSSH and docker were installed and in this stage the pipeline copies the dpcker-compose file for the server and pulls the public image from docker hub.
-A static IP was given to the server for better traceability 192.168.1.200
+However, this deployment was not successful due to insufficient Docker execution permissions on the provided infrastructure. The server explicitly denied the execution of Docker images, which made it impossible to run containerized services in that environment.
+![DEIserverDenyErrors.png](images/DEIserverDenyErrors.png)
+![DEIServerAppArmorError.png](images/DEIServerAppArmorError.png)
+
+As a result, an alternative solution was adopted. The team deployed the application to a private home server provided by one of the group members. This server runs Ubuntu LTS and is hosted on repurposed hardware (an older laptop). The environment was prepared with OpenSSH for secure remote access and Docker / Docker Compose for container orchestration.
+![](images/RemoteHomeServer.png)
+
+In this stage of the pipeline, Jenkins securely connects to the remote server via SSH, transfers the required docker-compose configuration file, and pulls the publicly available Docker images from Docker Hub. The services are then started using Docker Compose, ensuring a reproducible and automated deployment process.
+To improve accessibility and traceability during testing and evaluation, the server was assigned a static IP address (192.168.1.200)
+![](images/RemoteSystem.png)
+
+---
+
+### Local and Remote applications running
+
+Local Users
+![LocalUsers.png](images/LocalUsers.png)
+
+Remote server Books
+![](images/RemoteBooks.png)
+
+Remote server Users
+![](images/RemoteUsers.png)
+
+## Final Pipeline Overview
+
+Pipeline Users
+![PipelineUsers.png](images/PipelineUsers.png)
+
+Pipeline Books
+![PipelineBooks.png](images/PipelineBooks.png)
