@@ -160,6 +160,7 @@ pipeline {
                 sh """
                     scp -P 10819 -o StrictHostKeyChecking=no Project2/lms-authnusers/docker-compose.yml root@vsgate-ssh.dei.isep.ipp.pt:/opt/lms/docker-compose.yml
                     ssh -o StrictHostKeyChecking=no -p 10819 root@vsgate-ssh.dei.isep.ipp.pt << 'EOF'
+                    docker network create lms_network
                     cd /opt/lms
                     docker-compose pull
                     docker-compose up -d
