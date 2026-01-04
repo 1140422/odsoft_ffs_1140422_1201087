@@ -85,7 +85,7 @@ pipeline {
         }
         post {
             always {
-                junit '${APP_PATH}/target/surefire-reports/*.xml'
+                junit 'lms-books/target/surefire-reports/*.xml'
                 recordCoverage(tools: [[parser: 'JACOCO']],
                     id: 'jacoco', name: 'JaCoCo Coverage',
                     sourceCodeRetention: 'EVERY_BUILD',
