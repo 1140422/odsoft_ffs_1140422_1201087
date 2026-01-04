@@ -59,3 +59,8 @@ After all build, test stages complete successfully, the pipeline sends an automa
 
 
 ### Remote Deployment Via SSH
+In this stage the group tried to do a deployment in DEI remote servers, however we were not successfull due to permissions on docker, the server denied us to execute any image:
+IMAGE
+
+For this reason, we decided to use a home server from one team element, this server is a Ubuntu LTS built on an old laptop, openSSH and docker were installed and in this stage the pipeline copies the dpcker-compose file for the server and pulls the public image from docker hub.
+A static IP was given to the server for better traceability 192.168.1.200
