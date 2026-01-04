@@ -31,6 +31,11 @@ Through the pipeline we push the image to dockerhub, so it is public and we can 
 With Docker Compose we deploy the application locally together with its dependencies, like Postgres and RabbitMQ, here we stop the previous containers rebuild and start the new services
 
 ### (Books service only) Email and manual approval
-In this stage only for 
+In this stage only for Books service an email is sent stating that all tests passed and the application is waiting manual approval to go to production deployment
 
 ### Remote Deployment Via SSH
+In this stage the group tried to do a deployment in DEI remote servers, however we were not successfull due to permissions on docker, the server denied us to execute any image:
+IMAGE
+
+For this reason, we decided to use a home server from one team element, this server is a Ubuntu LTS built on an old laptop, openSSH and docker were installed and in this stage the pipeline copies the dpcker-compose file for the server and pulls the public image from docker hub.
+A static IP was given to the server for better traceability 192.168.1.200
